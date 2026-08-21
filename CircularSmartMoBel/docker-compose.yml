@@ -1,0 +1,10 @@
+services:
+
+  backend:
+    build: ./backend
+    container_name: circular_backend
+
+    ports:
+      - "3000:3000"
+
+    restart: unless-stopped
