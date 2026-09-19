@@ -106,16 +106,24 @@
 
         <p>เข้าสู่ระบบเพื่อเริ่มออกแบบ Packaging 3D</p>
 
-        <form action="#" method="post">
+        <form id="loginForm">
 
     <div class="form-group">
         <label>Email</label>
-        <input type="email" placeholder="example@email.com" required>
+        <input
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            required>
     </div>
 
     <div class="form-group">
         <label>Password</label>
-        <input type="password" placeholder="********" required>
+        <input
+            type="password"
+            id="password"
+            placeholder="********"
+            required>
     </div>
 
     <button type="submit" class="btn-login">
@@ -123,6 +131,8 @@
     </button>
 
 </form>
+
+<div id="message" style="margin-top:15px;"></div>
 
 <p style="margin-top:15px;">
     ยังไม่มีบัญชี?
@@ -135,3 +145,55 @@
 <a href="index.html" class="back-home">
     ← กลับหน้าหลัก
 </a>
+
+<script>
+document.getElementById("loginForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const email =
+        document.getElementById("email").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    const message =
+        document.getElementById("message");
+
+    try {
+
+        const response = await fetch(
+            "https://circular-smart-mobel-api.onrender.com/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        message.style.color = "green";
+        message.innerHTML = data.message;
+
+    } catch(error) {
+
+        message.style.color = "red";
+        message.innerHTML =
+            "ไม่สามารถเชื่อมต่อ Backend ได้";
+
+    }
+
+});
+</script>
+
+</div>
+
+</body>
+</html>
