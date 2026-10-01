@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+</head>
+<body>
+
+<h1>Dashboard</h1>
+
+<p id="welcome"></p>
+
+<button onclick="logout()">Logout</button>
+
+<script>
+
+const token = localStorage.getItem("token");
+
+if (!token) {
+    window.location.href = "login.html";
+}
+
+const email =
+    localStorage.getItem("userEmail");
+
+document.getElementById("welcome").innerHTML =
+    "ยินดีต้อนรับ : " + email;
+
+function logout() {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+
+    window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>
