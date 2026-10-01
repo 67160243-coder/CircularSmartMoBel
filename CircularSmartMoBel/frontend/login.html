@@ -147,6 +147,11 @@
 </a>
 
 <script>
+    
+if (localStorage.getItem("token")) {
+    window.location.href = "dashboard.html";
+}
+
 document.getElementById("loginForm")
 .addEventListener("submit", async function(e){
 
@@ -179,8 +184,31 @@ document.getElementById("loginForm")
 
         const data = await response.json();
 
-        message.style.color = "green";
-        message.innerHTML = data.message;
+if (data.success) {
+
+    localStorage.setItem(
+        "userEmail",
+        data.email
+    );
+
+    localStorage.setItem(
+        "token",
+        "logged_in"
+    );
+
+    message.style.color = "green";
+    message.innerHTML = data.message;
+
+    setTimeout(() => {
+        window.location.href = "dashboard.html";
+    }, 1000);
+
+} else {
+
+    message.style.color = "red";
+    message.innerHTML = data.message;
+
+}
 
     } catch(error) {
 
