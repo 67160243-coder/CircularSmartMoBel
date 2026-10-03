@@ -46,7 +46,16 @@ h1{
 .btn:hover{
     background:#6a9c7d;
 }
+.button-group{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
 
+.btn{
+    text-decoration:none;
+}
 </style>
 </head>
 <body>
@@ -57,9 +66,17 @@ h1{
 
     <p id="welcome"></p>
 
+<div class="button-group">
+
+    <a href="index.html" class="btn">
+        🏠 กลับหน้าหลัก
+    </a>
+
     <button class="btn" onclick="logout()">
-        Logout
+        🚪 Logout
     </button>
+
+</div>
 
 </div>
 
