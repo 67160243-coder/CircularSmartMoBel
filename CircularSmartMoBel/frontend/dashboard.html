@@ -2,34 +2,83 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Circular Smart MoBel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:'Prompt',sans-serif;
+    background:linear-gradient(135deg,#eef7f2 0%,#fffbf0 100%);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.dashboard-box{
+    width:500px;
+    background:white;
+    padding:40px;
+    border-radius:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.08);
+    text-align:center;
+}
+
+h1{
+    font-family:'Mali',cursive;
+    color:#4a7c59;
+}
+
+.btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:12px 25px;
+    border:none;
+    border-radius:30px;
+    background:#88b79a;
+    color:white;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#6a9c7d;
+}
+
+</style>
 </head>
 <body>
 
-<h1>Dashboard</h1>
+<div class="dashboard-box">
 
-<p id="welcome"></p>
+    <h1>🌱 Dashboard</h1>
 
-<button onclick="logout()">Logout</button>
+    <p id="welcome"></p>
+
+    <button class="btn" onclick="logout()">
+        Logout
+    </button>
+
+</div>
 
 <script>
 
 const token = localStorage.getItem("token");
 
-if (!token) {
+if(!token){
     window.location.href = "login.html";
 }
 
-const email =
-    localStorage.getItem("userEmail");
+const email = localStorage.getItem("userEmail");
 
 document.getElementById("welcome").innerHTML =
     "ยินดีต้อนรับ : " + email;
 
-function logout() {
+function logout(){
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
+    localStorage.clear();
 
     window.location.href = "login.html";
 }
