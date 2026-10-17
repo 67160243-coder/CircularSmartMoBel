@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>แกลเลอรี 3D | Circular Smart MoBel Plastic Tree</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#2e7d4f;--dk:#163a2c;--mint:#e6f4ea}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Prompt',Tahoma,sans-serif;background:#faf9f6;color:#1b2a24}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;background:#fff;box-shadow:0 1px 6px #0001}
+header b{color:var(--g);font-size:18px}
+nav a{margin-left:20px;text-decoration:none;color:#333}
+nav a.on{color:var(--g);font-weight:600}
+nav a.btn{background:#8fc3a2;color:#fff;padding:8px 16px;border-radius:20px}
+.wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;padding:20px 5vw;max-width:1350px;margin:auto}
+#view{height:600px;border-radius:20px;background:linear-gradient(135deg,#eef8f1,#fff9ec);border:2px dashed #b9d9c5;overflow:hidden}
+.hint{text-align:center;color:#6b7a72;font-size:13px;margin:8px 0 0}
+.panel{background:#fff;border-radius:20px;padding:20px;box-shadow:0 4px 18px #0001}
+h3{margin:16px 0 8px;font-size:15px;color:var(--dk)}h3:first-child{margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips input{display:none}
+.chips span{display:block;padding:7px 14px;border-radius:20px;background:var(--mint);cursor:pointer;font-size:14px;border:2px solid transparent}
+.chips input:checked+span{background:var(--g);color:#fff}
+.row{display:grid;grid-template-columns:110px 1fr 70px;align-items:center;gap:8px;font-size:14px;margin:6px 0}
+input[type=range]{width:100%;accent-color:var(--g)}
+input[type=number],input[type=text]{width:100%;padding:8px 10px;border:1px solid #cfdcd4;border-radius:10px;font:inherit}
+input[type=color]{width:44px;height:34px;border:none;background:none;padding:0}
+.res{background:var(--mint);border-radius:14px;padding:14px;margin-top:16px;font-size:14px}
+.res div{display:flex;justify-content:space-between;padding:3px 0}
+.res .big{font-size:18px;font-weight:600;color:var(--dk)}
+.res .good{color:var(--g);font-weight:600}.res .bad{color:#b5523b;font-weight:600}
+.go{width:100%;margin-top:14px;padding:13px;border:0;border-radius:14px;background:var(--g);color:#fff;font:600 16px 'Prompt',sans-serif;cursor:pointer}
+.go:hover{background:var(--dk)}
+.note{font-size:12px;color:#6b7a72;margin-top:10px}
+#receipt{display:none;position:fixed;inset:0;background:#000a;z-index:9;overflow:auto;padding:20px}
+.paper{background:#fff;max-width:620px;margin:auto;border-radius:12px;padding:28px;font-size:14px}
+.paper h2{margin:0;color:var(--dk)}
+.paper table{width:100%;border-collapse:collapse;margin:12px 0}
+.paper td,.paper th{padding:6px 4px;border-bottom:1px solid #e3ebe6;text-align:left}
+.paper td:last-child,.paper th:last-child{text-align:right}
+.paper img{width:100%;max-height:220px;object-fit:contain;background:#eef8f1;border-radius:10px}
+.tot td{font-weight:600;border-bottom:0}
+.acts{display:flex;gap:10px;margin-top:16px}
+.acts button{flex:1;padding:11px;border-radius:12px;border:0;font:600 14px 'Prompt',sans-serif;cursor:pointer;background:var(--g);color:#fff}
+.acts button+button{background:#e3ebe6;color:#333}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}#view{height:380px}}
+@media print{header,.wrap,.acts{display:none}#receipt{position:static;background:none;padding:0;display:block!important}.paper{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <b>🌱 Circular Smart MoBel Plastic Tree</b>
+  <nav><a href="index.html">หน้าแรก</a><a class="on" href="gallery.html">แกลเลอรี 3D</a><a href="#">วัสดุของเรา</a><a class="btn" href="login.html">Log In 🔐</a></nav>
+</header>
+
+<main class="wrap">
+  <section>
+    <div id="view"></div>
+    <p class="hint">ลากเพื่อหมุน · ล้อเมาส์/บีบนิ้วเพื่อซูม</p>
+  </section>
+
+  <aside class="panel">
+    <h3>1) เลือกรูปทรง</h3>
+    <div class="chips" id="shapes">
+      <label><input type="radio" name="shape" value="box" checked><span>🍱 กล่องเหลี่ยม</span></label>
+      <label><input type="radio" name="shape" value="cyl"><span>🥤 ถ้วยกลม</span></label>
+      <label><input type="radio" name="shape" value="bowl"><span>🥣 ชาม</span></label>
+    </div>
+
+    <h3>2) ปั้นขนาด (มม.)</h3>
+    <div class="chips" id="presets">
+      <label><input type="radio" name="pre" value="120,90,45"><span>S</span></label>
+      <label><input type="radio" name="pre" value="160,120,55" checked><span>M</span></label>
+      <label><input type="radio" name="pre" value="220,160,70"><span>L</span></label>
+    </div>
+    <div class="row"><span id="lw">กว้าง</span><input type="range" id="sw" min="60" max="300" value="160"><output id="ow"></output></div>
+    <div class="row" id="rd"><span>ลึก</span><input type="range" id="sd" min="60" max="300" value="120"><output id="od"></output></div>
+    <div class="row"><span>สูง</span><input type="range" id="sh" min="30" max="150" value="55"><output id="oh"></output></div>
+    <div class="row"><span>ความหนาผนัง</span><input type="range" id="st" min="0.3" max="3" step="0.1" value="1"><output id="ot"></output></div>
+    <label style="font-size:14px"><input type="checkbox" id="lid" checked> มีฝาปิด</label>
+
+    <h3>3) เลือกวัสดุและสี</h3>
+    <div class="chips" id="mats"></div>
+    <div class="row" style="grid-template-columns:110px 60px 1fr"><span>สีผลิตภัณฑ์</span><input type="color" id="col" value="#cfe8ff"><span></span></div>
+
+    <h3>4) จำนวนสั่งผลิต / ชื่อลูกค้า</h3>
+    <div class="row" style="grid-template-columns:110px 1fr"><span>จำนวน (ชิ้น)</span><input type="number" id="qty" min="1" value="500"></div>
+    <div class="row" style="grid-template-columns:110px 1fr"><span>ชื่อลูกค้า/ร้าน</span><input type="text" id="cust" placeholder="เช่น ร้านข้าวกล่องใจดี"></div>
+
+    <div class="res" id="res"></div>
+    <button class="go" id="go">🧾 ออกใบเสร็จ</button>
+    <p class="note">ค่า Emission Factor และราคาวัสดุเป็นค่าประมาณเพื่อสาธิตระบบต้นแบบ ควรอัปเดตจากข้อมูลที่ผ่านการรับรองก่อนใช้งานจริง</p>
+  </aside>
+</main>
+
+<div id="receipt"><div class="paper" id="paper"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const f=n=>n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// d=ความหนาแน่น g/cm3, ef=kgCO2e/kg, p=บาท/kg (ค่าประมาณเพื่อสาธิต)
+const MAT={
+ pp:{n:'PP พลาสติกใหม่',d:.91,ef:2.0,p:50,col:'#e8e8e8',r:.35},
+ pcr:{n:'PCR-PET รีไซเคิล',d:1.38,ef:.9,p:70,col:'#cfe8ff',r:.45},
+ pla:{n:'PLA ไบโอพลาสติก',d:1.24,ef:1.4,p:110,col:'#f3e9c6',r:.5},
+ bag:{n:'ชานอ้อย (Bagasse)',d:.8,ef:.6,p:80,col:'#d8c39a',r:.9},
+ pap:{n:'กระดาษขึ้นรูป',d:.75,ef:1.0,p:65,col:'#e9dcc3',r:.9}};
+const SHAPE={box:'กล่องเหลี่ยม',cyl:'ถ้วยกลม',bowl:'ชาม'};
+$('mats').innerHTML=Object.entries(MAT).map(([k,m],i)=>`<label><input type="radio" name="mat" value="${k}" ${k==='pcr'?'checked':''}><span>${m.n}</span></label>`).join('');
+
+function read(){const q=n=>document.querySelector(`[name=${n}]:checked`).value;
+ return{shape:q('shape'),mat:q('mat'),W:+$('sw').value,D:+$('sd').value,H:+$('sh').value,t:+$('st').value,
+  lid:$('lid').checked,color:$('col').value,qty:Math.max(1,parseInt($('qty').value)||1)}}
+
+function vol(s,W,D,H,t,lid){const P=Math.PI,R=W/2,fr=(a,b,h)=>P*h/3*(a*a+a*b+b*b);let v;
+ if(s==='box'){v=W*D*H-(W-2*t)*(D-2*t)*(H-t);if(lid)v+=W*D*t}
+ else if(s==='cyl'){v=P*(R*R*H-(R-t)**2*(H-t));if(lid)v+=P*R*R*t}
+ else{const r=R*.65;v=fr(R,r,H)-fr(R-t,r-t,H-t);if(lid)v+=P*R*R*t}
+ return v}
+
+function calc(o){const M=MAT[o.mat],v=vol(o.shape,o.W,o.D,o.H,o.t,o.lid);
+ const g=v/1000*M.d,gb=v/1000*MAT.pp.d,co=g/1000*M.ef,cb=gb/1000*MAT.pp.ef;
+ const unit=g/1000*M.p+1.2,disc=o.qty>=5000?.15:o.qty>=1000?.1:o.qty>=500?.05:0;
+ const sub=unit*(1-disc)*o.qty,vat=sub*.07;
+ return{g,co,cb,unit,disc,sub,vat,tot:sub+vat,coT:co*o.qty,cbT:cb*o.qty,save:(cb-co)*o.qty,pct:cb?(cb-co)/cb*100:0}}
+
+// ---------- 3D ----------
+const el=$('view'),S=1/40;
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));el.appendChild(renderer.domElement);
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,100);
+cam.position.set(9,7,11);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);
+ctl.enableDamping=true;ctl.target.set(0,1.4,0);ctl.minDistance=4;ctl.maxDistance=26;ctl.maxPolarAngle=Math.PI/2.05;
+scene.add(new THREE.HemisphereLight(0xffffff,0xb7d7c2,.95));
+const dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(5,10,6);scene.add(dl);
+const floor=new THREE.Mesh(new THREE.CircleGeometry(9,64),new THREE.MeshBasicMaterial({color:0xdcefe3}));
+floor.rotation.x=-Math.PI/2;floor.position.y=-.01;scene.add(floor);
+const grp=new THREE.Group();scene.add(grp);
+
+function build(o){
+ grp.clear();
+ const {shape,W,D,H,t,lid,mat,color}=o;
+ const m=new THREE.MeshStandardMaterial({color,roughness:MAT[mat].r,side:THREE.DoubleSide});
+ const lm=m.clone();lm.transparent=true;lm.opacity=.65;
+ const add=(g,x,y,z,mm=m)=>{const me=new THREE.Mesh(g,mm);me.position.set(x*S,y*S,z*S);grp.add(me)};
+ const bx=(a,b,c)=>new THREE.BoxGeometry(a*S,b*S,c*S),ly=H+t/2+25;
+ if(shape==='box'){
+  add(bx(W,t,D),0,t/2,0);
+  add(bx(W,H,t),0,H/2,D/2-t/2);add(bx(W,H,t),0,H/2,-D/2+t/2);
+  add(bx(t,H,D-2*t),W/2-t/2,H/2,0);add(bx(t,H,D-2*t),-W/2+t/2,H/2,0);
+  if(lid)add(bx(W,t,D),0,ly,0,lm);
+ }else{
+  const R=W/2,rb=shape==='cyl'?R:R*.65;
+  const pts=[[0,0],[rb,0],[R,H],[R-t,H],[rb-t,t],[0,t]].map(p=>new THREE.Vector2(p[0]*S,p[1]*S));
+  add(new THREE.LatheGeometry(pts,64),0,0,0);
+  if(lid)add(new THREE.CylinderGeometry(R*S,R*S,t*S,64),0,ly,0,lm);
+ }}
+function fit(){const w=el.clientWidth,h=el.clientHeight;renderer.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix()}
+new ResizeObserver(fit).observe(el);
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam)})();
+
+// ---------- UI ----------
+function update(){
+ const o=read(),c=calc(o);
+ $('rd').style.display=o.shape==='box'?'':'none';
+ $('lw').textContent=o.shape==='box'?'กว้าง':'เส้นผ่านศูนย์กลาง';
+ [['w','sw'],['d','sd'],['h','sh'],['t','st']].forEach(([k,id])=>$('o'+k).textContent=$(id).value+' มม.');
+ build(o);
+ $('res').innerHTML=`
+  <div><span>น้ำหนักต่อชิ้น</span><span>${f(c.g)} g</span></div>
+  <div><span>คาร์บอนต่อชิ้น</span><span>${(c.co*1000).toFixed(1)} g CO₂e</span></div>
+  <div class="big"><span>คาร์บอนรวม ${o.qty.toLocaleString()} ชิ้น</span><span>${f(c.coT)} kg CO₂e</span></div>
+  <div><span>เทียบ PP พลาสติกใหม่</span><span class="${c.save>=0?'good':'bad'}">${c.save>=0?'ลด':'เพิ่ม'} ${f(Math.abs(c.save))} kg (${c.pct.toFixed(0)}%)</span></div>
+  <hr style="border:0;border-top:1px solid #c9dfd0">
+  <div><span>ราคาต่อชิ้น${c.disc?` (ลด ${c.disc*100}%)`:''}</span><span>${f(c.unit*(1-c.disc))} ฿</span></div>
+  <div class="big"><span>รวม (รวม VAT 7%)</span><span>${f(c.tot)} ฿</span></div>`;
+}
+document.querySelectorAll('input').forEach(i=>i.addEventListener('input',update));
+$('presets').addEventListener('change',e=>{const [w,d,h]=e.target.value.split(',');$('sw').value=w;$('sd').value=d;$('sh').value=h;update()});
+$('mats').addEventListener('change',e=>{$('col').value=MAT[e.target.value].col;update()});
+
+// ---------- Receipt ----------
+$('go').onclick=()=>{
+ const o=read(),c=calc(o);renderer.render(scene,cam);
+ const img=renderer.domElement.toDataURL('image/png'),d=new Date();
+ const no='MB-'+d.toISOString().slice(0,10).replace(/-/g,'')+'-'+String(Math.floor(Math.random()*9000)+1000);
+ const size=o.shape==='box'?`${o.W}×${o.D}×${o.H}`:`Ø${o.W}×${o.H}`;
+ $('paper').innerHTML=`
+  <h2>🌱 ใบเสร็จรับเงิน / Receipt</h2>
+  <div style="color:#6b7a72">Circular Smart MoBel Plastic Tree (MoBel EcoPack)</div>
+  <p>เลขที่: <b>${no}</b><br>วันที่: ${d.toLocaleString('th-TH')}<br>ลูกค้า: ${esc($('cust').value.trim())||'-'}</p>
+  <img src="${img}" alt="โมเดล 3D">
+  <table>
+   <tr><th>รายการ</th><th>จำนวน</th><th>ราคา/ชิ้น</th><th>รวม</th></tr>
+   <tr><td>${SHAPE[o.shape]} ${size} มม.<br><small>วัสดุ ${MAT[o.mat].n} · ผนัง ${o.t} มม. · ${o.lid?'มีฝา':'ไม่มีฝา'}</small></td>
+       <td>${o.qty.toLocaleString()}</td><td>${f(c.unit*(1-c.disc))}</td><td>${f(c.sub)}</td></tr>
+   <tr class="tot"><td colspan="3">ภาษีมูลค่าเพิ่ม 7%</td><td>${f(c.vat)}</td></tr>
+   <tr class="tot"><td colspan="3">ยอดรวมสุทธิ (บาท)</td><td>${f(c.tot)}</td></tr>
+  </table>
+  <p>♻️ คาร์บอนฟุตพริ้นท์รวม <b>${f(c.coT)} kg CO₂e</b> — ${c.save>=0?'ลดลง':'เพิ่มขึ้น'} <b>${f(Math.abs(c.save))} kg</b> (${c.pct.toFixed(0)}%) เทียบกับ PP พลาสติกใหม่${c.disc?`<br>ส่วนลดตามปริมาณ ${c.disc*100}%`:''}</p>
+  <p class="note">เอกสารจากระบบต้นแบบ ไม่ใช่ใบกำกับภาษี · ค่าคาร์บอนเป็นค่าประมาณ</p>
+  <div class="acts"><button onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button><button onclick="$('receipt').style.display='none'">ปิด</button></div>`;
+ $('receipt').style.display='block';
+};
+fit();update();
+</script>
+</body>
+</html>

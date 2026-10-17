@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>วัสดุของเรา | Circular Smart MoBel Plastic Tree</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#2e7d4f;--dk:#163a2c;--mint:#e6f4ea}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Prompt',Tahoma,sans-serif;background:#faf9f6;color:#1b2a24}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;background:#fff;box-shadow:0 1px 6px #0001}
+header b{color:var(--g);font-size:18px}
+nav a{margin-left:20px;text-decoration:none;color:#333}
+nav a.on{color:var(--g);font-weight:600}
+nav a.btn{background:#8fc3a2;color:#fff;padding:8px 16px;border-radius:20px}
+main{max-width:1200px;margin:auto;padding:28px 5vw 50px}
+h1{margin:0 0 6px;color:var(--dk);font-size:30px}
+.sub{color:#5b6b63;margin:0 0 18px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:22px;font-size:14px}
+.chips{display:flex;gap:8px}
+.chips input{display:none}
+.chips span{display:block;padding:7px 16px;border-radius:20px;background:var(--mint);cursor:pointer}
+.chips input:checked+span{background:var(--g);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.card{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 18px #0001;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:10px}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid #0002;flex:none}
+.top h2{margin:0;font-size:19px;color:var(--dk)}
+.tag{display:inline-block;margin:8px 6px 0 0;padding:3px 10px;border-radius:12px;font-size:12px;background:var(--mint);color:var(--g);font-weight:600}
+.tag.base{background:#eee;color:#555}
+.desc{font-size:14px;color:#44544c;margin:10px 0}
+.price{background:var(--mint);border-radius:14px;padding:12px 14px;margin:6px 0 10px}
+.price .big{font-size:26px;font-weight:600;color:var(--dk)}
+.price small{color:#5b6b63}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+td{padding:3px 0;border-bottom:1px dashed #c9dfd0}
+td:last-child{text-align:right}
+.st{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13px;margin:8px 0}
+.st span{color:#6b7a72;display:block;font-size:12px}
+ul{margin:4px 0 8px;padding-left:18px;font-size:13px}
+.pro li::marker{color:var(--g)}.con li::marker{color:#b5523b}
+.go{margin-top:auto;display:block;text-align:center;padding:11px;border-radius:12px;background:var(--g);color:#fff;text-decoration:none;font-weight:600}
+.go:hover{background:var(--dk)}
+.note{font-size:12px;color:#6b7a72;margin-top:22px}
+</style>
+</head>
+<body>
+<header>
+  <b>🌱 Circular Smart MoBel Plastic Tree</b>
+  <nav><a href="index.html">หน้าแรก</a><a href="gallery.html">แกลเลอรี 3D</a><a class="on" href="materials.html">วัสดุของเรา</a><a class="btn" href="login.html">Log In 🔐</a></nav>
+</header>
+<main>
+  <h1>วัสดุของเรา</h1>
+  <p class="sub">เปรียบเทียบคุณสมบัติ คาร์บอนฟุตพริ้นท์ และราคาต่อชิ้นของวัสดุบรรจุภัณฑ์แต่ละประเภท</p>
+  <div class="bar">
+    <b>คำนวณราคาจากขนาดกล่อง (กล่องเหลี่ยม มีฝา):</b>
+    <div class="chips" id="sizes">
+      <label><input type="radio" name="sz" value="120,90,45"><span>S 120×90×45</span></label>
+      <label><input type="radio" name="sz" value="160,120,55" checked><span>M 160×120×55</span></label>
+      <label><input type="radio" name="sz" value="220,160,70"><span>L 220×160×70</span></label>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="note">* น้ำหนัก ราคา และค่า Emission Factor เป็นค่าประมาณเพื่อสาธิตระบบต้นแบบ (ผนังหนา 1 มม., ราคา = ค่าวัสดุ + ค่าขึ้นรูป 1.20 บาท/ชิ้น, ยังไม่รวม VAT 7%) ควรอัปเดตจากข้อมูลจริงของผู้ผลิตและค่าที่ผ่านการรับรองก่อนใช้งานจริง · ส่วนลดตามปริมาณสั่งซื้อ: 500+ ลด 5%, 1,000+ ลด 10%, 5,000+ ลด 15%</p>
+</main>
+<script>
+const f=n=>n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});
+// d=g/cm3, ef=kgCO2e/kg, p=บาท/kg — ต้องตรงกับ gallery.html
+const MAT={
+ pp:{n:'PP พลาสติกใหม่',tags:['Baseline (ใช้เปรียบเทียบ)'],base:1,d:.91,ef:2.0,p:50,col:'#e8e8e8',
+  desc:'พอลิโพรพิลีนบริสุทธิ์ที่ใช้กันทั่วไปในกล่องอาหาร ใช้เป็นเกณฑ์เทียบการลดคาร์บอนของวัสดุอื่น',
+  heat:'ทนร้อน ~100–120°C เข้าไมโครเวฟได้',eol:'รีไซเคิลได้ (รหัส 5)',
+  pro:['แข็งแรง กันน้ำมันและความชื้น','ราคาประหยัด หาง่าย'],con:['ผลิตจากปิโตรเคมี คาร์บอนสูงที่สุดในกลุ่ม','มักถูกทิ้งเป็นขยะใช้ครั้งเดียว']},
+ pcr:{n:'PCR-PET รีไซเคิล',tags:['รีไซเคิล'],d:1.38,ef:.9,p:70,col:'#cfe8ff',
+  desc:'PET ที่ผลิตจากพลาสติกหลังการบริโภค (Post-Consumer Recycled) ช่วยลดการใช้เม็ดพลาสติกใหม่',
+  heat:'ทนร้อนต่ำกว่า ~60–70°C ไม่เหมาะไมโครเวฟ',eol:'รีไซเคิลต่อได้ (รหัส 1)',
+  pro:['ใส เห็นอาหารชัด','ลดคาร์บอนได้มากเมื่อเทียบ PP ใหม่'],con:['ไม่เหมาะกับอาหารร้อนจัด','ราคาสูงกว่า PP']},
+ pla:{n:'PLA ไบโอพลาสติก',tags:['ย่อยสลายได้'],d:1.24,ef:1.4,p:110,col:'#f3e9c6',
+  desc:'ไบโอพลาสติกจากแป้งพืช เช่น ข้าวโพดหรือมันสำปะหลัง ย่อยสลายได้ในระบบหมักปุ๋ยเชิงอุตสาหกรรม',
+  heat:'ทนร้อนต่ำ ~50–60°C เหมาะกับอาหารเย็น',eol:'ย่อยสลายในระบบหมักเชิงอุตสาหกรรม',
+  pro:['ผลิตจากวัตถุดิบหมุนเวียน','ใสและแข็ง ใกล้เคียงพลาสติกทั่วไป'],con:['ราคาสูงที่สุดในกลุ่ม','ต้องมีระบบจัดการขยะรองรับ']},
+ bag:{n:'ชานอ้อย (Bagasse)',tags:['ย่อยสลายได้','วัสดุเหลือใช้'],d:.8,ef:.6,p:80,col:'#d8c39a',
+  desc:'เส้นใยเหลือใช้จากอุตสาหกรรมน้ำตาล นำมาขึ้นรูปเป็นภาชนะ ย่อยสลายตามธรรมชาติ',
+  heat:'ทนร้อนและเข้าไมโครเวฟได้',eol:'ย่อยสลายตามธรรมชาติ / ทำปุ๋ยหมัก',
+  pro:['คาร์บอนต่ำมาก','ทนร้อน ใช้กับอาหารร้อนได้'],con:['ทึบแสง ไม่เห็นอาหารด้านใน','ผิวสัมผัสหยาบกว่าพลาสติก']},
+ pap:{n:'กระดาษขึ้นรูป',tags:['รีไซเคิล'],d:.75,ef:1.0,p:65,col:'#e9dcc3',
+  desc:'ภาชนะกระดาษขึ้นรูป น้ำหนักเบา พิมพ์ลายแบรนด์ได้สวย',
+  heat:'ทนร้อนปานกลาง ทนความชื้นจำกัด',eol:'รีไซเคิลได้ (ถ้าเคลือบกันซึมต้องแยกก่อน)',
+  pro:['เบา พิมพ์ลายสวย','คาร์บอนต่ำกว่า PP'],con:['ต้องเคลือบกันซึมสำหรับอาหารเปียก','ไม่ทนการแช่น้ำนาน']}};
+
+function vol(W,D,H,t){return W*D*H-(W-2*t)*(D-2*t)*(H-t)+W*D*t} // กล่องเหลี่ยม + ฝา
+function render(){
+ const [W,D,H]=document.querySelector('[name=sz]:checked').value.split(',').map(Number),v=vol(W,D,H,1);
+ const gb=v/1000*MAT.pp.d,cb=gb/1000*MAT.pp.ef;
+ document.getElementById('grid').innerHTML=Object.entries(MAT).map(([k,m])=>{
+  const g=v/1000*m.d,co=g/1000*m.ef,unit=g/1000*m.p+1.2,pct=(cb-co)/cb*100;
+  const tier=(label,d)=>`<tr><td>${label}</td><td>${f(unit*(1-d))} ฿</td></tr>`;
+  return `<div class="card">
+   <div class="top"><span class="dot" style="background:${m.col}"></span><h2>${m.n}</h2></div>
+   <div>${m.tags.map(t=>`<span class="tag ${m.base?'base':''}">${t}</span>`).join('')}</div>
+   <p class="desc">${m.desc}</p>
+   <div class="price"><small>ราคาต่อชิ้น (ไม่รวม VAT)</small><div class="big">${f(unit)} ฿</div>
+    <table>${tier('1–499 ชิ้น',0)}${tier('500+ ชิ้น (ลด 5%)',.05)}${tier('1,000+ ชิ้น (ลด 10%)',.1)}${tier('5,000+ ชิ้น (ลด 15%)',.15)}</table></div>
+   <div class="st">
+    <div><span>น้ำหนักต่อชิ้น</span>${f(g)} g</div>
+    <div><span>คาร์บอนต่อชิ้น</span>${(co*1000).toFixed(1)} g CO₂e</div>
+    <div><span>เทียบ PP ใหม่</span>${m.base?'—':'ลด '+pct.toFixed(0)+'%'}</div>
+    <div><span>ราคาวัตถุดิบ</span>~${m.p} ฿/กก.</div>
+    <div style="grid-column:1/3"><span>ความทนร้อน</span>${m.heat}</div>
+    <div style="grid-column:1/3"><span>หลังใช้งาน</span>${m.eol}</div>
+   </div>
+   <ul class="pro">${m.pro.map(x=>`<li>${x}</li>`).join('')}</ul>
+   <ul class="con">${m.con.map(x=>`<li>${x}</li>`).join('')}</ul>
+   <a class="go" href="gallery.html?mat=${k}">ลองออกแบบด้วยวัสดุนี้ →</a></div>`}).join('');
+}
+document.getElementById('sizes').addEventListener('change',render);
+render();
+</script>
+</body>
+</html>
