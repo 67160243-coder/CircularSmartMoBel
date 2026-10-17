@@ -184,37 +184,53 @@ document.getElementById("loginForm")
 
         const data = await response.json();
 
-if (data.success) {
+if (!response.ok) {
+    throw new Error(
+        data.message || "เกิดข้อผิดพลาดจาก Backend"
+    );
+}
 
+if (data.success && data.token) {
+
+    // บันทึกอีเมลของผู้ใช้
     localStorage.setItem(
         "userEmail",
         data.email
     );
 
+    // บันทึก Access Token จริงจาก Supabase
     localStorage.setItem(
         "token",
-        "logged_in"
+        data.token
     );
 
     message.style.color = "green";
-    message.innerHTML = data.message;
+    message.textContent = data.message || "เข้าสู่ระบบสำเร็จ";
 
     setTimeout(() => {
         window.location.href = "dashboard.html";
     }, 1000);
 
+} else if (data.success && !data.token) {
+
+    message.style.color = "#b7791f";
+    message.textContent =
+        "เข้าสู่ระบบสำเร็จ แต่ไม่พบ Token กรุณาตรวจสอบ Backend";
+
 } else {
 
     message.style.color = "red";
-    message.innerHTML = data.message;
+    message.textContent =
+        data.message || "เข้าสู่ระบบไม่สำเร็จ";
+
 
 }
 
     } catch(error) {
 
         message.style.color = "red";
-        message.innerHTML =
-            "ไม่สามารถเชื่อมต่อ Backend ได้";
+        message.textContent =
+    error.message || "ไม่สามารถเชื่อมต่อ Backend ได้";
 
     }
 
