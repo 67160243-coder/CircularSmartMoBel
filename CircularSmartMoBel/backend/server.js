@@ -209,6 +209,145 @@ app.post("/change-password", async (req, res) => {
     }
 });
 
+
+// ---------- Saved 3D designs API ----------
+// ใช้ access token ของผู้ใช้ เพื่อให้ Supabase RLS ตรวจสอบสิทธิ์เจ้าของข้อมูล
+function getBearerToken(req) {
+    return req.headers.authorization?.replace(/^Bearer\s+/i, "");
+}
+
+async function getAuthenticatedUser(token) {
+    if (!token) return { user: null, error: new Error("Please log in first") };
+    const userClient = getUserClient(token);
+    const { data, error } = await userClient.auth.getUser();
+    return { user: data?.user ?? null, error, userClient };
+}
+
+app.get("/designs", async (req, res) => {
+    try {
+        const { user, error, userClient } = await getAuthenticatedUser(getBearerToken(req));
+        if (error || !user) {
+            return res.status(401).json({ success: false, message: "Please log in again" });
+        }
+
+        const { data, error: dbError } = await userClient
+            .from("saved_designs")
+            .select("id, name, design, created_at, updated_at")
+            .eq("user_id", user.id)
+            .order("updated_at", { ascending: false });
+
+        if (dbError) {
+            return res.status(400).json({ success: false, message: dbError.message });
+        }
+        res.json({ success: true, designs: data ?? [] });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error while loading designs" });
+    }
+});
+
+app.get("/designs/:id", async (req, res) => {
+    try {
+        const { user, error, userClient } = await getAuthenticatedUser(getBearerToken(req));
+        if (error || !user) {
+            return res.status(401).json({ success: false, message: "Please log in again" });
+        }
+
+        const { data, error: dbError } = await userClient
+            .from("saved_designs")
+            .select("id, name, design, created_at, updated_at")
+            .eq("id", req.params.id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+        if (dbError) {
+            return res.status(400).json({ success: false, message: dbError.message });
+        }
+        if (!data) return res.status(404).json({ success: false, message: "Design not found" });
+        res.json({ success: true, design: data });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error while loading design" });
+    }
+});
+
+app.post("/designs", async (req, res) => {
+    try {
+        const { user, error, userClient } = await getAuthenticatedUser(getBearerToken(req));
+        if (error || !user) {
+            return res.status(401).json({ success: false, message: "Please log in again" });
+        }
+
+        const name = String(req.body?.name ?? "").trim();
+        const design = req.body?.design;
+        if (!name || !design || typeof design !== "object") {
+            return res.status(400).json({ success: false, message: "Please provide a design name and design data" });
+        }
+
+        const { data, error: dbError } = await userClient
+            .from("saved_designs")
+            .insert({ user_id: user.id, name, design })
+            .select("id, name, design, created_at, updated_at")
+            .single();
+
+        if (dbError) return res.status(400).json({ success: false, message: dbError.message });
+        res.status(201).json({ success: true, message: "Design saved", design: data });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error while saving design" });
+    }
+});
+
+app.put("/designs/:id", async (req, res) => {
+    try {
+        const { user, error, userClient } = await getAuthenticatedUser(getBearerToken(req));
+        if (error || !user) {
+            return res.status(401).json({ success: false, message: "Please log in again" });
+        }
+
+        const name = String(req.body?.name ?? "").trim();
+        const design = req.body?.design;
+        if (!name || !design || typeof design !== "object") {
+            return res.status(400).json({ success: false, message: "Please provide a design name and design data" });
+        }
+
+        const { data, error: dbError } = await userClient
+            .from("saved_designs")
+            .update({ name, design, updated_at: new Date().toISOString() })
+            .eq("id", req.params.id)
+            .eq("user_id", user.id)
+            .select("id, name, design, created_at, updated_at")
+            .maybeSingle();
+
+        if (dbError) return res.status(400).json({ success: false, message: dbError.message });
+        if (!data) return res.status(404).json({ success: false, message: "Design not found" });
+        res.json({ success: true, message: "Design updated", design: data });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error while updating design" });
+    }
+});
+
+app.delete("/designs/:id", async (req, res) => {
+    try {
+        const { user, error, userClient } = await getAuthenticatedUser(getBearerToken(req));
+        if (error || !user) {
+            return res.status(401).json({ success: false, message: "Please log in again" });
+        }
+
+        const { data, error: dbError } = await userClient
+            .from("saved_designs")
+            .delete()
+            .eq("id", req.params.id)
+            .eq("user_id", user.id)
+            .select("id")
+            .maybeSingle();
+
+        if (dbError) return res.status(400).json({ success: false, message: dbError.message });
+        if (!data) return res.status(404).json({ success: false, message: "Design not found" });
+        res.json({ success: true, message: "Design deleted" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error while deleting design" });
+    }
+});
+
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
