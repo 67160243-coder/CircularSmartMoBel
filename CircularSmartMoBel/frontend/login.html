@@ -199,10 +199,7 @@ if (data.success && data.token) {
     );
 
     // บันทึก Access Token จริงจาก Supabase
-    localStorage.setItem(
-        "token",
-        data.token
-    );
+    localStorage.setItem("token", data.token);
 
     message.style.color = "green";
     message.textContent = data.message || "เข้าสู่ระบบสำเร็จ";
