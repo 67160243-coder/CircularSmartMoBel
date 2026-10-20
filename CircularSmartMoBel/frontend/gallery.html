@@ -52,7 +52,7 @@ input[type=color]{width:44px;height:34px;border:none;background:none;padding:0}
 <body>
 <header>
   <b>🌱 Circular Smart MoBel Plastic Tree</b>
-  <nav><a href="index.html">หน้าแรก</a><a class="on" href="gallery.html">แกลเลอรี 3D</a><a href="materials.html">วัสดุของเรา</a><a class="btn" href="login.html">Log In 🔐</a></nav>
+  <nav><a href="index.html">หน้าแรก</a><a class="on" href="gallery.html">แกลเลอรี 3D</a><a href="materials.html">วัสดุของเรา</a><a href="my-designs.html">ผลงานของฉัน</a><a class="btn" href="login.html">Log In 🔐</a></nav>
 </header>
 
 <main class="wrap">
@@ -90,7 +90,9 @@ input[type=color]{width:44px;height:34px;border:none;background:none;padding:0}
     <div class="row" style="grid-template-columns:110px 1fr"><span>ชื่อลูกค้า/ร้าน</span><input type="text" id="cust" placeholder="เช่น ร้านข้าวกล่องใจดี"></div>
 
     <div class="res" id="res"></div>
-    <button class="go" id="go">🧾 ออกใบเสร็จ</button>
+    <button class="go" id="saveDesign" type="button">💾 บันทึกผลงานออกแบบ</button>
+    <button class="go" id="go" type="button" style="background:#6d8f7b">🧾 ออกใบเสร็จ</button>
+    <p class="note" id="saveStatus" role="status"></p>
     <p class="note">ค่า Emission Factor และราคาวัสดุเป็นค่าประมาณเพื่อสาธิตระบบต้นแบบ ควรอัปเดตจากข้อมูลที่ผ่านการรับรองก่อนใช้งานจริง</p>
   </aside>
 </main>
@@ -208,7 +210,108 @@ $('go').onclick=()=>{
   <div class="acts"><button onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button><button onclick="$('receipt').style.display='none'">ปิด</button></div>`;
  $('receipt').style.display='block';
 };
-fit();update();
+
+// ---------- Save / reopen design ----------
+const API_BASE = "https://circular-smart-mobel-api.onrender.com";
+let currentDesignId = new URLSearchParams(location.search).get("design");
+let currentDesignName = "";
+
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+function applyDesign(d) {
+  if (!d) return;
+  const setRadio = (name, value) => {
+    const el = document.querySelector(`[name="${name}"][value="${value}"]`);
+    if (el) el.checked = true;
+  };
+  setRadio("shape", d.shape || "box");
+  setRadio("mat", d.mat || "pcr");
+  $("sw").value = d.W ?? 160;
+  $("sd").value = d.D ?? 120;
+  $("sh").value = d.H ?? 55;
+  $("st").value = d.t ?? 1;
+  $("lid").checked = d.lid !== false;
+  $("col").value = d.color || "#cfe8ff";
+  $("qty").value = d.qty ?? 500;
+  $("cust").value = d.cust || "";
+  currentDesignName = d.name || currentDesignName;
+  update();
+}
+
+async function loadSavedDesign() {
+  if (!currentDesignId) return;
+  const token = getToken();
+  if (!token) {
+    $("saveStatus").textContent = "กรุณาเข้าสู่ระบบก่อนเปิดผลงานที่บันทึกไว้";
+    return;
+  }
+  try {
+    const r = await fetch(`${API_BASE}/designs/${encodeURIComponent(currentDesignId)}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await r.json();
+    if (!r.ok || !data.success) throw new Error(data.message || "เปิดผลงานไม่สำเร็จ");
+    currentDesignName = data.design.name;
+    applyDesign({ ...data.design.design, name: data.design.name });
+    $("saveDesign").textContent = "💾 บันทึกการแก้ไข";
+    $("saveStatus").textContent = `กำลังแก้ไขผลงาน: ${currentDesignName}`;
+  } catch (err) {
+    $("saveStatus").textContent = err.message;
+  }
+}
+
+$("saveDesign").addEventListener("click", async () => {
+  const token = getToken();
+  if (!token) {
+    alert("กรุณาเข้าสู่ระบบก่อนบันทึกผลงานออกแบบ");
+    location.href = "login.html";
+    return;
+  }
+
+  const suggestedName = currentDesignName || `ผลงาน ${new Date().toLocaleDateString("th-TH")}`;
+  const name = prompt("ตั้งชื่อผลงานออกแบบ:", suggestedName);
+  if (name === null) return;
+  if (!name.trim()) {
+    alert("กรุณาระบุชื่อผลงาน");
+    return;
+  }
+
+  const design = { ...read(), cust: $("cust").value.trim() };
+  const isUpdate = Boolean(currentDesignId);
+  $("saveDesign").disabled = true;
+  $("saveDesign").textContent = "กำลังบันทึก...";
+  try {
+    const r = await fetch(isUpdate
+      ? `${API_BASE}/designs/${encodeURIComponent(currentDesignId)}`
+      : `${API_BASE}/designs`, {
+      method: isUpdate ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ name: name.trim(), design })
+    });
+    const data = await r.json();
+    if (!r.ok || !data.success) throw new Error(data.message || "บันทึกผลงานไม่สำเร็จ");
+    currentDesignId = data.design.id;
+    currentDesignName = data.design.name;
+    $("saveDesign").textContent = "💾 บันทึกการแก้ไข";
+    $("saveStatus").textContent = `บันทึก “${currentDesignName}” เรียบร้อยแล้ว`;
+    history.replaceState(null, "", `gallery.html?design=${encodeURIComponent(currentDesignId)}`);
+  } catch (err) {
+    $("saveStatus").textContent = `บันทึกไม่สำเร็จ: ${err.message}`;
+    alert(`บันทึกไม่สำเร็จ: ${err.message}`);
+  } finally {
+    $("saveDesign").disabled = false;
+    if (currentDesignId) $("saveDesign").textContent = "💾 บันทึกการแก้ไข";
+    else $("saveDesign").textContent = "💾 บันทึกผลงานออกแบบ";
+  }
+});
+
+
+fit();update();loadSavedDesign();
 </script>
 </body>
 </html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ผลงานของฉัน | Circular Smart MoBel Plastic Tree</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--g:#2e7d4f;--dk:#163a2c;--mint:#e6f4ea}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Prompt',Tahoma,sans-serif;background:#faf9f6;color:#1b2a24}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 5vw;background:#fff;box-shadow:0 1px 6px #0001}
+header b{color:var(--g);font-size:18px}
+nav a{margin-left:16px;text-decoration:none;color:#333}
+nav a.on{color:var(--g);font-weight:600}
+main{max-width:1100px;margin:30px auto;padding:0 5vw}
+h1{color:var(--dk);font-size:25px}
+.sub{color:#6b7a72}
+#status{padding:12px 0;color:#6b7a72}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 4px 18px #0001}
+.card h2{font-size:18px;margin:0 0 8px;color:var(--dk);overflow-wrap:anywhere}
+.meta{font-size:13px;color:#6b7a72;line-height:1.8}
+.actions{display:flex;gap:8px;margin-top:15px}
+button,.primary{border:0;border-radius:10px;padding:10px 12px;font:600 14px 'Prompt',sans-serif;cursor:pointer;text-decoration:none;text-align:center}
+.primary{background:var(--g);color:#fff;flex:1}
+.del{background:#f8e8e4;color:#963e2e}
+.empty{background:#fff;border-radius:16px;padding:22px}
+@media(max-width:600px){nav a{margin-left:8px;font-size:13px}}
+</style>
+</head>
+<body>
+<header>
+  <b>🌱 Circular Smart MoBel Plastic Tree</b>
+  <nav><a href="index.html">หน้าแรก</a><a href="gallery.html">แกลเลอรี 3D</a><a class="on" href="my-designs.html">ผลงานของฉัน</a></nav>
+</header>
+<main>
+  <h1>💾 ผลงานออกแบบของฉัน</h1>
+  <p class="sub">รายการนี้แสดงเฉพาะผลงานที่บันทึกด้วยบัญชีที่เข้าสู่ระบบอยู่</p>
+  <div id="status">กำลังโหลดผลงาน...</div>
+  <div id="cards" class="cards"></div>
+  <p><a class="primary" href="gallery.html">＋ สร้างผลงานใหม่</a></p>
+</main>
+<script>
+const API_BASE = "https://circular-smart-mobel-api.onrender.com";
+const token = localStorage.getItem("token");
+const statusEl = document.getElementById("status");
+const cardsEl = document.getElementById("cards");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shapeNames = {box:"กล่องเหลี่ยม",cyl:"ถ้วยกลม",bowl:"ชาม"};
+const materialNames = {pp:"PP พลาสติกใหม่",pcr:"PCR-PET รีไซเคิล",pla:"PLA ไบโอพลาสติก",bag:"ชานอ้อย (Bagasse)",pap:"กระดาษขึ้นรูป"};
+
+async function loadDesigns() {
+  if (!token) {
+    statusEl.textContent = "กรุณาเข้าสู่ระบบก่อนดูผลงานที่บันทึกไว้";
+    const link = document.createElement("a");
+    link.href = "login.html";
+    link.className = "primary";
+    link.textContent = "เข้าสู่ระบบ";
+    statusEl.appendChild(document.createTextNode(" "));
+    statusEl.appendChild(link);
+    return;
+  }
+  try {
+    const r = await fetch(`${API_BASE}/designs`, {headers:{Authorization:`Bearer ${token}`}});
+    const data = await r.json();
+    if (!r.ok || !data.success) throw new Error(data.message || "โหลดผลงานไม่สำเร็จ");
+    const designs = data.designs || [];
+    statusEl.textContent = designs.length ? `พบ ${designs.length} ผลงาน` : "";
+    if (!designs.length) {
+      cardsEl.innerHTML = '<div class="empty">ยังไม่มีผลงานที่บันทึกไว้ กด “สร้างผลงานใหม่” เพื่อเริ่มออกแบบได้เลย</div>';
+      return;
+    }
+    cardsEl.innerHTML = designs.map(item => {
+      const d = item.design || {};
+      const size = d.shape === "box" ? `${d.W} × ${d.D} × ${d.H} มม.` : `Ø${d.W} × ${d.H} มม.`;
+      const date = item.updated_at ? new Date(item.updated_at).toLocaleString("th-TH") : "";
+      return `<article class="card">
+        <h2>${esc(item.name)}</h2>
+        <div class="meta">
+          รูปทรง: ${esc(shapeNames[d.shape] || d.shape || "-")}<br>
+          ขนาด: ${esc(size)}<br>
+          วัสดุ: ${esc(materialNames[d.mat] || d.mat || "-")}<br>
+          จำนวน: ${Number(d.qty || 0).toLocaleString("th-TH")} ชิ้น<br>
+          ลูกค้า/ร้าน: ${esc(d.cust || "-")}<br>
+          แก้ไขล่าสุด: ${esc(date)}
+        </div>
+        <div class="actions">
+          <a class="primary" href="gallery.html?design=${encodeURIComponent(item.id)}">เปิด / แก้ไข</a>
+          <button class="del" data-delete="${esc(item.id)}" data-name="${esc(item.name)}">ลบ</button>
+        </div>
+      </article>`;
+    }).join("");
+    cardsEl.querySelectorAll("[data-delete]").forEach(btn => btn.addEventListener("click", () => deleteDesign(btn.dataset.delete, btn.dataset.name)));
+  } catch (err) {
+    statusEl.textContent = `เกิดข้อผิดพลาด: ${err.message}`;
+  }
+}
+async function deleteDesign(id, name) {
+  if (!confirm(`ต้องการลบผลงาน “${name}” ใช่หรือไม่?`)) return;
+  try {
+    const r = await fetch(`${API_BASE}/designs/${encodeURIComponent(id)}`, {
+      method:"DELETE", headers:{Authorization:`Bearer ${token}`}
+    });
+    const data = await r.json();
+    if (!r.ok || !data.success) throw new Error(data.message || "ลบผลงานไม่สำเร็จ");
+    await loadDesigns();
+  } catch (err) { alert(`ลบผลงานไม่สำเร็จ: ${err.message}`); }
+}
+loadDesigns();
+</script>
+</body>
+</html>
